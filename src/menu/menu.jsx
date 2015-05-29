@@ -75,14 +75,15 @@ var NestedMenuItem = React.createClass({
     } = this.props;
 
     return (
-      <div ref="root" style={styles} onMouseEnter={this._openNestedMenu} onMouseLeave={this._closeNestedMenu}>
+      <div ref="root" style={styles} onMouseLeave={this._closeNestedMenu}>
         <MenuItem 
           index={index}
           style={menuItemStyle}
           disabled={this.props.disabled} 
           iconRightStyle={iconCustomArrowDropRight} 
           iconRightClassName="muidocs-icon-custom-arrow-drop-right" 
-          onClick={this._onParentItemClick}>
+          onClick={this._onParentItemClick}
+          onMouseOver={this._openNestedMenu}>
             {this.props.text}
         </MenuItem>
         <Menu {...other}
@@ -105,10 +106,12 @@ var NestedMenuItem = React.createClass({
   },
   
   _openNestedMenu: function() {
+    React.findDOMNode(this.refs.nestedMenu).style.display = 'block';
     if (!this.props.disabled) this.setState({ open: true });
   },
   
   _closeNestedMenu: function() {
+    React.findDOMNode(this.refs.nestedMenu).style.display = 'none';
     this.setState({ open: false });
   },
   
@@ -183,6 +186,7 @@ var Menu = React.createClass({
 
     //Save the initial menu height for later
     this._initialMenuHeight = el.offsetHeight;
+    // el.style.display = 'block'
 
     //Show or Hide the menu according to visibility
     this._renderVisibility();
@@ -214,6 +218,8 @@ var Menu = React.createClass({
       },
       hideable: {
         opacity: (this.props.visible) ? 1 : 0,
+        height: '0',
+        display: 'none',
         overflow: 'hidden',
         position: 'absolute',
         top: 0,
@@ -368,7 +374,9 @@ var Menu = React.createClass({
       if (this.props.visible) {
         //Open the menu
         el.style.transition = Transitions.easeOut();
-        el.style.height = this._initialMenuHeight + 'px';
+        el.style.display = 'block'
+        // el.style.height = this._initialMenuHeight + 'px';
+        el.style.height = el.scrollHeight +'px';
 
         //Set the overflow to visible after the animation is done so
         //that other nested menus can be shown
@@ -381,7 +389,7 @@ var Menu = React.createClass({
       } else {
 
         //Close the menu
-        el.style.height = '0px';
+        el.style.height = '0';
 
         //Set the overflow to hidden so that animation works properly
         container.style.overflow = 'hidden';
